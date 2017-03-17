@@ -12,6 +12,7 @@ public class BunnyController : MonoBehaviour
 	private Collider2D collider;
 	public Text scoreText;
 	private float startTime;
+	private int jumpsLeft = 2;
 
 	// Use this for initialization
 	void Start ()
@@ -28,8 +29,18 @@ public class BunnyController : MonoBehaviour
 	{
 		if(bunnyHurtTime == -1)
 		{
-			if(Input.GetButtonUp("Jump") || Input.GetMouseButtonDown(0))
-				rigidBody.AddForce(transform.up * bunnyJumpForce);
+			if((Input.GetButtonUp("Jump") || Input.GetMouseButtonDown(0)) && (jumpsLeft > 0))
+			{
+				if(rigidBody.velocity.y < 0)
+					rigidBody.velocity = Vector2.zero;
+
+				if(jumpsLeft == 1)
+					rigidBody.AddForce(transform.up * bunnyJumpForce * 0.75f);
+				else
+					rigidBody.AddForce(transform.up * bunnyJumpForce);
+
+				jumpsLeft--;
+			}
 
 			animator.SetFloat("vVelocity", rigidBody.velocity.y);
 			scoreText.text = (Time.time - startTime).ToString("0.0");
@@ -56,6 +67,10 @@ public class BunnyController : MonoBehaviour
 			rigidBody.velocity = Vector2.zero;
 			rigidBody.AddForce(transform.up * bunnyJumpForce);
 			collider.enabled = false;
+		}
+		else if(collision.collider.gameObject.layer == LayerMask.NameToLayer("Ground"))
+		{
+				jumpsLeft = 2;	
 		}
 	}
 }
